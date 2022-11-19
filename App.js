@@ -1,4 +1,5 @@
 import { StatusBar } from "expo-status-bar";
+import React, { useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,12 +7,25 @@ import {
   SafeAreaView,
   Button,
   Alert,
+  Pressable,
+  Animated,
+  TouchableNativeFeedback,
 } from "react-native";
 import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { Component } from "react";
 
+// const fadeAnim = useRef(new Animated.Value(0)).current;
+
+// const fadeIn = () => {
+//   // Will change fadeAnim value to 1 in 5 seconds
+//   Animated.timing(fadeAnim, {
+//     toValue: 1,
+//     duration: 5000,
+//   }).start();
+//   console.log("Fade In");
+// };
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -26,17 +40,24 @@ export default class App extends Component {
   async getLocation() {
     let location = await Location.getLastKnownPositionAsync();
     this.setState({
-      location,
+      latitude: location.latitude,
+      longitude: location.longitude,
     });
   }
 
   async componentDidMount() {
-    let permission = await Location.getBackgroundPermissionsAsync();
-    if (permission !== undetermined) {
-      Alert.alert("Insufficient Permissions: " + permission.status);
-    } else {
-      this.getLocation();
-    }
+    let permission = await Location.requestForegroundPermissionsAsync();
+    let location = await Location.getLastKnownPositionAsync();
+
+    this.setState({
+      latitude: location.latitude,
+      longitude: location.longitude,
+    });
+
+    //this.setState();
+    console.log(permission);
+    console.log(location);
+    //this.getLocation();
   }
 
   async getLocationTest() {
@@ -60,6 +81,13 @@ export default class App extends Component {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
+          region={{
+            latitude: this.state.latitude,
+            longitude: this.state.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+          showsUserLocation={true}
         >
           <Marker
             coordinate={{
@@ -70,12 +98,15 @@ export default class App extends Component {
           ></Marker>
         </MapView>
         <StatusBar style="auto" />
+
         <View style={styles.button}>
           <Button
             title="Current Location"
-            onPress={() => this.setState(this.getLocationTest())}
+            onPress={() => this.setState(this.componentDidMount())}
+
+            //onPressOut={fadeIn}
           >
-            <Text>Current Location</Text>{" "}
+            <Text>Current Location</Text>
           </Button>
         </View>
         <View style={styles.button}>
@@ -125,7 +156,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 0.05,
-    backgroundColor: "black",
+
     borderRadius: 15,
     borderWidth: 2,
     borderColor: "black",
@@ -133,6 +164,12 @@ const styles = StyleSheet.create({
     margin: 7,
   },
   buttonFont: {
-    color: "black",
+    color: "blue",
+  },
+  text: {
+    backgroundColor: "blue",
+    borderRadius: 5,
+    borderColor: "dodgerblue",
+    fontSize: 16,
   },
 });
