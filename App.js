@@ -1,5 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, SafeAreaView, Button } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  Button,
+  Alert,
+} from "react-native";
 import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
 import * as Location from "expo-location";
@@ -8,17 +15,42 @@ import { Component } from "react";
 export default class App extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       latitude: 33.307146,
       longitude: -111.68177,
+      location: null,
     };
+  }
+
+  async getLocation() {
+    let location = await Location.getLastKnownPositionAsync();
+    this.setState({
+      location,
+    });
+  }
+
+  async componentDidMount() {
+    let permission = await Location.getBackgroundPermissionsAsync();
+    if (permission !== undetermined) {
+      Alert.alert("Insufficient Permissions: " + permission.status);
+    } else {
+      this.getLocation();
+    }
+  }
+
+  async getLocationTest() {
+    this.state.latitude = 45.7762;
+    this.state.longitude = -111.1771;
+    console.log(this.state.latitude);
+    console.log(this.state.longitude);
   }
 
   render() {
     return (
       <SafeAreaView style={styles.container}>
         <Text>
-          Logitude: {this.state.longitude} Latitude: {this.state.latitude}
+          Longitude: {this.state.longitude} Latitude: {this.state.latitude}
         </Text>
         <MapView
           style={styles.map}
@@ -39,7 +71,10 @@ export default class App extends Component {
         </MapView>
         <StatusBar style="auto" />
         <View style={styles.button}>
-          <Button title="Current Location">
+          <Button
+            title="Current Location"
+            onPress={() => this.setState(this.getLocationTest())}
+          >
             <Text>Current Location</Text>{" "}
           </Button>
         </View>
@@ -48,8 +83,8 @@ export default class App extends Component {
             title="POI 1"
             onPress={() =>
               this.setState(
-                { latitude: 33.307146 },
-                this.setState({ longitude: -111.68177 })
+                { latitude: 33.423204 },
+                this.setState({ longitude: -111.939612 })
               )
             }
           >
@@ -61,8 +96,8 @@ export default class App extends Component {
             title="POI 2"
             onPress={() =>
               this.setState(
-                { latitude: 33.423204 },
-                this.setState({ longitude: -111.939612 })
+                { latitude: 33.307146 },
+                this.setState({ longitude: -111.681177 })
               )
             }
           >
