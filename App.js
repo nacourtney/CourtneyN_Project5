@@ -1,41 +1,25 @@
-import { StatusBar } from "expo-status-bar";
-import React, { useRef } from "react";
+import React, { Component } from "react";
 import {
-  StyleSheet,
   Text,
+  TouchableOpacity,
+  StyleSheet,
   View,
   SafeAreaView,
   Button,
-  Alert,
-  Pressable,
-  Animated,
-  TouchableNativeFeedback,
 } from "react-native";
+import Notification from "./Notification";
 import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import { Component } from "react";
 
-// const fadeAnim = useRef(new Animated.Value(0)).current;
-
-// const fadeIn = () => {
-//   // Will change fadeAnim value to 1 in 5 seconds
-//   Animated.timing(fadeAnim, {
-//     toValue: 1,
-//     duration: 5000,
-//   }).start();
-//   console.log("Fade In");
-// };
 export default class App extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      latitude: 33.307146,
-      longitude: -111.68177,
-      location: null,
-    };
-  }
+  state = {
+    notify: false,
+    message: "This is a notification!",
+    latitude: 33.307146,
+    longitude: -111.68177,
+    location: null,
+  };
 
   async getLocation() {
     let location = await Location.getLastKnownPositionAsync();
@@ -43,6 +27,19 @@ export default class App extends Component {
       latitude: location.latitude,
       longitude: location.longitude,
     });
+  }
+
+  toggleNotification = () => {
+    this.setState({
+      notify: !this.state.notify,
+    });
+  };
+
+  async getLocationTest() {
+    this.state.latitude = 45.7762;
+    this.state.longitude = -111.1771;
+    console.log(this.state.latitude);
+    console.log(this.state.longitude);
   }
 
   async componentDidMount() {
@@ -60,19 +57,20 @@ export default class App extends Component {
     //this.getLocation();
   }
 
-  async getLocationTest() {
-    this.state.latitude = 45.7762;
-    this.state.longitude = -111.1771;
-    console.log(this.state.latitude);
-    console.log(this.state.longitude);
-  }
-
   render() {
+    const notify = this.state.notify ? (
+      <Notification
+        autoHide
+        message={this.state.message}
+        onClose={this.toggleNotification}
+      />
+    ) : null;
     return (
-      <SafeAreaView style={styles.container}>
-        <Text>
+      <SafeAreaView>
+        <Text style={styles.toolbar}>
           Longitude: {this.state.longitude} Latitude: {this.state.latitude}
         </Text>
+        <Text></Text>
         <MapView
           style={styles.map}
           initialRegion={{
@@ -89,6 +87,7 @@ export default class App extends Component {
           }}
           showsUserLocation={true}
         >
+          {notify}
           <Marker
             coordinate={{
               latitude: this.state.latitude,
@@ -97,9 +96,7 @@ export default class App extends Component {
             image={require("./Markers/you-are-here.png")}
           ></Marker>
         </MapView>
-        <StatusBar style="auto" />
-
-        <View style={styles.button}>
+        <View style={styles.btn}>
           <Button
             title="Current Location"
             onPress={() => this.setState(this.componentDidMount())}
@@ -109,7 +106,7 @@ export default class App extends Component {
             <Text>Current Location</Text>
           </Button>
         </View>
-        <View style={styles.button}>
+        <View style={styles.btn}>
           <Button
             title="POI 1"
             onPress={() =>
@@ -122,7 +119,7 @@ export default class App extends Component {
             <Text style={styles.buttonFont}>Point of Interest 1</Text>
           </Button>
         </View>
-        <View style={styles.button}>
+        <View style={styles.btn}>
           <Button
             title="POI 2"
             onPress={() =>
@@ -135,41 +132,61 @@ export default class App extends Component {
             <Text>Point of Interest 2</Text>
           </Button>
         </View>
+        <View style={styles.content}>
+          <TouchableOpacity
+            onPress={this.toggleNotification}
+            style={styles.btn}
+          ></TouchableOpacity>
+        </View>
       </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+  toolbar: {
+    backgroundColor: "#8e44ad",
+    color: "#fff",
+    fontSize: 22,
+    padding: 20,
+    textAlign: "center",
+    borderColor: "black",
+    borderWidth: 5,
+    borderRadius: 5,
   },
+  // content: {
+  //   padding: 10,
+  //   overflow: "hidden",
+  //   borderColor: "deeppink",
+  //   borderWidth: 5,
+  // },
+  btn: {
+    margin: 10,
+    backgroundColor: "#9b59b6",
+    borderRadius: 5,
+    borderWidth: 5,
+    borderColor: "black",
+    padding: 10,
+  },
+  text: {
+    textAlign: "center",
+    color: "#fff",
+  },
+  // container: {
+  //   flex: 1,
+  //   backgroundColor: "#fff",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   borderWidth: 5,
+  //   borderColor: "red",
+  //   borderRadius: 5,
+  // },
   map: {
-    flex: 0.5,
+    //flex: 1,
     borderRadius: 15,
     borderWidth: 3,
     height: "50%",
     width: "100%",
-  },
-  button: {
-    flex: 0.05,
-
-    borderRadius: 15,
-    borderWidth: 2,
-    borderColor: "black",
-    padding: 10,
-    margin: 7,
-  },
-  buttonFont: {
-    color: "blue",
-  },
-  text: {
-    backgroundColor: "blue",
-    borderRadius: 5,
-    borderColor: "dodgerblue",
-    fontSize: 16,
+    borderColor: "blue",
   },
 });
