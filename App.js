@@ -19,6 +19,7 @@ export default class App extends Component {
     latitude: 33.307146,
     longitude: -111.68177,
     location: null,
+    messageNumber: 0,
   };
 
   async getLocation() {
@@ -55,6 +56,19 @@ export default class App extends Component {
     console.log(permission);
     console.log(location);
     //this.getLocation();
+    console.log(message);
+    console.log(messageNumber);
+  }
+
+  getMessage() {
+    if (this.state.messageNumber === 1) {
+      this.setState({ message: "Changed to POI 1" });
+    }
+    if (this.state.messageNumber === 2) {
+      this.setState({ message: "Changed to POI 2" });
+    } else {
+      this.state.message = "Changed to You";
+    }
   }
 
   render() {
@@ -87,7 +101,6 @@ export default class App extends Component {
           }}
           showsUserLocation={true}
         >
-          {notify}
           <Marker
             coordinate={{
               latitude: this.state.latitude,
@@ -95,6 +108,7 @@ export default class App extends Component {
             }}
             image={require("./Markers/you-are-here.png")}
           ></Marker>
+          {notify}
         </MapView>
         <View style={styles.btn}>
           <Button
@@ -112,7 +126,11 @@ export default class App extends Component {
             onPress={() =>
               this.setState(
                 { latitude: 33.423204 },
-                this.setState({ longitude: -111.939612 })
+                this.setState(
+                  { longitude: -111.939612 },
+                  this.toggleNotification,
+                  this.setState({ message: "Changed to POI 1!" })
+                )
               )
             }
           >
@@ -125,18 +143,16 @@ export default class App extends Component {
             onPress={() =>
               this.setState(
                 { latitude: 33.307146 },
-                this.setState({ longitude: -111.681177 })
+                this.setState(
+                  { longitude: -111.681177 },
+                  this.toggleNotification,
+                  this.setState({ message: "Changed to POI 2!" })
+                )
               )
             }
           >
             <Text>Point of Interest 2</Text>
           </Button>
-        </View>
-        <View style={styles.content}>
-          <TouchableOpacity
-            onPress={this.toggleNotification}
-            style={styles.btn}
-          ></TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -162,7 +178,7 @@ const styles = StyleSheet.create({
   // },
   btn: {
     margin: 10,
-    backgroundColor: "#9b59b6",
+    backgroundColor: "red",
     borderRadius: 5,
     borderWidth: 5,
     borderColor: "black",

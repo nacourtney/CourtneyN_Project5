@@ -5,7 +5,7 @@ export default class Notification extends Component {
   animatedValue = new Animated.Value(0);
 
   static defaultProps = {
-    delay: 5000,
+    delay: 300,
     onClose: () => {},
     onOpen: () => {},
   };
@@ -26,9 +26,10 @@ export default class Notification extends Component {
     const { delay } = this.props;
     return Animated.timing(this.animatedValue, {
       toValue: value,
-      duration: 500,
+      duration: 300,
       easing: Easing.cubic,
       delay: autoHide ? delay : 0,
+      useNativeDriver: false,
     });
   }
 
